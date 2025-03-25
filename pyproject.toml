@@ -4,18 +4,25 @@ version = "0.1.0"
 description = "Lightweight request & response tracing for your Flask, Django, or FastAPI dev server"
 authors = ["Yeongseon Choe <yeongseon.choe@gmail.com>"]
 license = "MIT"
-packages = [{ include = "tracelite", from = "src" }]
+readme = "README.md"
+packages = [
+  { include = "tracelite", from = "src" }
+]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
+python = ">=3.9,<4.0"
 pydantic = "^2.6"
-typer = "^0.12"
+typer = "^0.15"
 rich = "^13.7"
 sqlalchemy = "^2.0"
 tomli = "^2.0"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+pytest-cov = "^5.0.0"
+flask = "^3.0"
+
 [tool.poetry.extras]
-flask = ["flask"]
 django = ["django"]
 fastapi = ["fastapi", "starlette"]
 

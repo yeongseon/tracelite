@@ -1,0 +1,7 @@
+[storage]
+type = "sqlite"
+path = "tracelite.db"
+
+[filter]
+exclude_paths = ["/static", "/favicon.ico"]
+mask_keys = ["password", "token"]
