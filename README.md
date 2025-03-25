@@ -1,6 +1,10 @@
 # README.md
 # Tracelite
 
+[![PyPI version](https://img.shields.io/pypi/v/tracelite)](https://pypi.org/project/tracelite/)
+[![Test](https://github.com/yeongseon/tracelite/actions/workflows/test.yml/badge.svg)](https://github.com/yeongseon/tracelite/actions/workflows/test.yml)
+
+
 **Lightweight request & response tracing for your Flask, Django, or FastAPI dev server**
 
 Tracelite logs incoming HTTP requests and outgoing responses in a structured format. It's ideal for local development and debugging.
