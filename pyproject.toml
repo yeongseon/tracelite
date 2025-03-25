@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "tracelite"
+version = "0.1.0"
+description = "Lightweight request & response tracing for your Flask, Django, or FastAPI dev server"
+authors = ["Yeongseon Choe <yeongseon.choe@gmail.com>"]
+license = "MIT"
+packages = [{ include = "tracelite", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+pydantic = "^2.6"
+typer = "^0.12"
+rich = "^13.7"
+sqlalchemy = "^2.0"
+tomli = "^2.0"
+
+[tool.poetry.extras]
+flask = ["flask"]
+django = ["django"]
+fastapi = ["fastapi", "starlette"]
+
+[tool.poetry.scripts]
+tracelite = "tracelite.cli.main:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
