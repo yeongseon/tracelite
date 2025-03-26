@@ -1,10 +1,6 @@
 # README.md
 # Tracelite
 
-[![PyPI version](https://img.shields.io/pypi/v/tracelite)](https://pypi.org/project/tracelite/)
-[![Test](https://github.com/yeongseon/tracelite/actions/workflows/test.yml/badge.svg)](https://github.com/yeongseon/tracelite/actions/workflows/test.yml)
-
-
 **Lightweight request & response tracing for your Flask, Django, or FastAPI dev server**
 
 Tracelite logs incoming HTTP requests and outgoing responses in a structured format. It's ideal for local development and debugging.
@@ -17,7 +13,7 @@ Tracelite logs incoming HTTP requests and outgoing responses in a structured for
 
 ## Installation
 ```bash
-pip install tracelite[flask]
+poetry install --with dev --extras "fastapi flask django"
 ```
 
 ## Usage
@@ -35,14 +31,31 @@ from tracelite.core.storage.sqlite import SQLiteStorage
 from tracelite.core.config import load_config
 
 app = Flask(__name__)
-config = load_config()
+config = load_config(app.config)
 storage = SQLiteStorage(db_path=config.db_path)
 
 app.wsgi_app = TraceliteMiddleware(app.wsgi_app, storage, config)
 ```
 
+### FastAPI Integration
+```python
+from fastapi import FastAPI
+from tracelite.middleware.fastapi import TraceliteMiddleware
+from tracelite.core.storage.sqlite import SQLiteStorage
+from tracelite.core.config import load_config
+
+app = FastAPI()
+config = load_config()
+storage = SQLiteStorage(db_path=config.db_path)
+
+app.add_middleware(TraceliteMiddleware, storage=storage, config=config)
+```
+
 ## Configuration (tracelite.toml)
 ```toml
+[tracelite]
+enabled = true
+
 [storage]
 type = "sqlite"
 path = "tracelite.db"
@@ -54,23 +67,8 @@ mask_keys = ["password", "token"]
 
 ## Testing
 ```bash
-poetry install --with dev
-pytest
+pytest --cov=tracelite --cov-report=term --cov-report=html
 ```
-
-## Coverage Report
-```bash
-open htmlcov/index.html
-```
-
-## Requirementsgit add .
-git commit -m "release: v0.1.0"
-git push origin main
-git tag v0.1.0
-git push origin v0.1.0
-
-- Python 3.9+
-- Flask 3.x
 
 ---
 
