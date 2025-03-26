@@ -1,23 +1,30 @@
+from pydantic import BaseModel
+from typing import List, Optional, Dict, Any
 import tomli
-from pathlib import Path
-from typing import List
+import os
 
-class AppConfig:
-    def __init__(self, db_path: str, exclude_paths: List[str], mask_keys: List[str]):
-        self.db_path = db_path
-        self.exclude_paths = exclude_paths
-        self.mask_keys = mask_keys
+class TraceliteConfig(BaseModel):
+    enabled: bool = True
+    db_path: str = "tracelite.db"
+    exclude_paths: List[str] = ["/static", "/favicon.ico"]
+    mask_keys: List[str] = ["password", "token"]
 
-def load_config(file_path: str = "tracelite.toml") -> AppConfig:
-    config_path = Path(file_path)
-    if not config_path.exists():
-        raise FileNotFoundError(f"Configuration file not found: {file_path}")
+def load_config(app_config: Optional[Dict[str, Any]] = None) -> TraceliteConfig:
+    config = TraceliteConfig()
 
-    with config_path.open("rb") as f:
-        data = tomli.load(f)
+    if os.path.exists("tracelite.toml"):
+        with open("tracelite.toml", "rb") as f:
+            data = tomli.load(f)
+            if "storage" in data:
+                config.db_path = data["storage"].get("path", config.db_path)
+            if "filter" in data:
+                config.exclude_paths = data["filter"].get("exclude_paths", config.exclude_paths)
+                config.mask_keys = data["filter"].get("mask_keys", config.mask_keys)
+            if "tracelite" in data:
+                config.enabled = data["tracelite"].get("enabled", config.enabled)
 
-    db_path = data.get("storage", {}).get("path", "tracelite.db")
-    exclude_paths = data.get("filter", {}).get("exclude_paths", [])
-    mask_keys = data.get("filter", {}).get("mask_keys", [])
+    if app_config:
+        config.enabled = app_config.get("TRACELITE_ENABLED", config.enabled)
+        config.db_path = app_config.get("TRACELITE_DB_PATH", config.db_path)
 
-    return AppConfig(db_path=db_path, exclude_paths=exclude_paths, mask_keys=mask_keys)
+    return config
