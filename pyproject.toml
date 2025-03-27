@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tracelite"
-version = "0.1.0"
+version = "0.2.0"
 description = "Lightweight request & response tracing for your Flask, Django, or FastAPI dev server"
 authors = ["Yeongseon Choe <yeongseon.choe@gmail.com>"]
 license = "MIT"
