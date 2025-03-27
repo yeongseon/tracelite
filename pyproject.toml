@@ -26,6 +26,8 @@ django = "^4.2"
 pytest = "^8.3.5"
 pytest-cov = "^5.0.0"
 tomli-w = "^1.2.0"
+black = "^25.1.0"
+isort = "^6.0.1"
 
 [tool.poetry.extras]
 flask = ["flask"]
@@ -38,3 +40,10 @@ tracelite = "tracelite.cli.main:app"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.isort]
+profile = "black"
