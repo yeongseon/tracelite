@@ -1,55 +1,37 @@
-# src/tracelite/middleware/flask.py
-from tracelite.core.models import RequestLog
-from tracelite.core.filters import should_exclude, mask_sensitive
-from datetime import datetime
-import time
+import pytest
+from flask import Flask, jsonify
+from tracelite.middleware.flask import TraceliteMiddleware
+from tracelite.core.storage.sqlite import SQLiteStorage
+from tracelite.core.config import load_config
 
-class TraceliteMiddleware:
-    def __init__(self, app, storage, config):
-        self.app = app
-        self.storage = storage
-        self.config = config
+@pytest.fixture
+def app():
+    app = Flask(__name__)
+    config = load_config()
+    storage = SQLiteStorage(":memory:")
+    app.wsgi_app = TraceliteMiddleware(app.wsgi_app, storage, config)
 
-    def __call__(self, environ, start_response):
-        start_time = time.time()
+    @app.route("/ping")
+    def ping():
+        return jsonify(message="pong")
 
-        path = environ.get("PATH_INFO", "")
-        method = environ.get("REQUEST_METHOD", "")
-        client_ip = environ.get("REMOTE_ADDR", "")
-        user_agent = environ.get("HTTP_USER_AGENT", "")
-        headers = {
-            k[5:].replace('_', '-').title(): v
-            for k, v in environ.items()
-            if k.startswith("HTTP_")
-        }
-        try:
-            content_length = int(environ.get("CONTENT_LENGTH", 0) or 0)
-            body = environ["wsgi.input"].read(content_length).decode("utf-8") if content_length > 0 else None
-        except Exception:
-            body = None
+    app.tracelite_storage = storage  # expose for test
+    return app
 
-        if should_exclude(path, self.config.exclude_paths):
-            return self.app(environ, start_response)
+@pytest.fixture
+def client(app):
+    return app.test_client()
 
-        def custom_start_response(status, response_headers, exc_info=None):
-            duration = (time.time() - start_time) * 1000
-            status_code = int(status.split()[0])
+def test_flask_middleware_logs_request(client):
+    response = client.get("/ping")
+    assert response.status_code == 200
 
-            log = RequestLog(
-                timestamp=datetime.utcnow(),
-                method=method,
-                path=path,
-                status_code=status_code,
-                client_ip=client_ip,
-                user_agent=user_agent,
-                request_headers=mask_sensitive(headers, self.config.mask_keys),
-                request_body=body,
-                response_headers=dict(response_headers),
-                response_body=None,
-                duration_ms=duration,
-            )
-            self.storage.store(log)
+    logs = client.application.tracelite_storage.fetch_recent()
+    assert len(logs) == 1
+    log = logs[0]
 
-            return start_response(status, response_headers, exc_info)
+    assert isinstance(log[1], str)
+    assert log[2] == "GET"           # method
+    assert log[3] == "/ping"        # path
+    assert log[4] == 200             # status_code
 
-        return self.app(environ, custom_start_response)
