@@ -1,8 +1,10 @@
+import json
 import sqlite3
+from datetime import datetime
+
 from tracelite.core.models import RequestLog
 from tracelite.core.storage.base import ILoggerStorage
-from datetime import datetime
-import json
+
 
 class SQLiteStorage(ILoggerStorage):
     def __init__(self, db_path: str = "tracelite.db"):
@@ -11,7 +13,8 @@ class SQLiteStorage(ILoggerStorage):
 
     def _create_table(self):
         with self.conn:
-            self.conn.execute("""
+            self.conn.execute(
+                """
             CREATE TABLE IF NOT EXISTS request_logs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 timestamp TEXT,
@@ -26,43 +29,52 @@ class SQLiteStorage(ILoggerStorage):
                 response_body TEXT,
                 duration_ms REAL
             )
-            """)
+            """
+            )
 
     def store(self, log: RequestLog) -> None:
         with self.conn:
-            self.conn.execute("""
+            self.conn.execute(
+                """
             INSERT INTO request_logs (
                 timestamp, method, path, status_code, client_ip, user_agent,
                 request_headers, request_body, response_headers, response_body, duration_ms
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                log.timestamp.isoformat(),
-                log.method,
-                log.path,
-                log.status_code,
-                log.client_ip,
-                log.user_agent,
-                json.dumps(log.request_headers),
-                log.request_body,
-                json.dumps(log.response_headers),
-                log.response_body,
-                log.duration_ms,
-            ))
+            """,
+                (
+                    log.timestamp.isoformat(),
+                    log.method,
+                    log.path,
+                    log.status_code,
+                    log.client_ip,
+                    log.user_agent,
+                    json.dumps(log.request_headers),
+                    log.request_body,
+                    json.dumps(log.response_headers),
+                    log.response_body,
+                    log.duration_ms,
+                ),
+            )
 
     def fetch_recent(self, since_seconds: int = 3600) -> list:
         cutoff = datetime.utcnow().timestamp() - since_seconds
         with self.conn:
-            rows = self.conn.execute("""
+            rows = self.conn.execute(
+                """
             SELECT * FROM request_logs WHERE strftime('%s', timestamp) >= ?
             ORDER BY timestamp DESC
-            """, (int(cutoff),)).fetchall()
+            """,
+                (int(cutoff),),
+            ).fetchall()
         return rows
 
     def export(self, format: str = "json") -> str:
         with self.conn:
             rows = self.conn.execute("SELECT * FROM request_logs").fetchall()
         if format == "json":
-            columns = [col[0] for col in self.conn.execute("PRAGMA table_info(request_logs)")]
+            columns = [
+                col[0] for col in self.conn.execute("PRAGMA table_info(request_logs)")
+            ]
             return json.dumps([dict(zip(columns, row)) for row in rows], indent=2)
         else:
             raise ValueError("Unsupported export format")

@@ -3,16 +3,21 @@ Tracelite middleware for Django applications.
 Logs HTTP requests and responses during local development.
 """
 
-from django.utils.deprecation import MiddlewareMixin
-from django.conf import settings
-from tracelite.core.models import RequestLog
-from tracelite.core.filters import should_exclude, mask_sensitive
-from datetime import datetime
 import time
+from datetime import datetime
 from typing import Any
 
+from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
+
+from tracelite.core.filters import mask_sensitive, should_exclude
+from tracelite.core.models import RequestLog
+
+
 class TraceliteMiddleware(MiddlewareMixin):
-    def __init__(self, get_response: Any = None, storage: Any = None, config: Any = None) -> None:
+    def __init__(
+        self, get_response: Any = None, storage: Any = None, config: Any = None
+    ) -> None:
         """
         Initialize Django middleware.
 
@@ -46,7 +51,9 @@ class TraceliteMiddleware(MiddlewareMixin):
             status_code=response.status_code,
             client_ip=request.META.get("REMOTE_ADDR", ""),
             user_agent=request.META.get("HTTP_USER_AGENT", ""),
-            request_headers=mask_sensitive(dict(request.headers), self.config.mask_keys),
+            request_headers=mask_sensitive(
+                dict(request.headers), self.config.mask_keys
+            ),
             request_body=request_body.decode("utf-8", errors="ignore"),
             response_headers=dict(response.items()),
             response_body=None,

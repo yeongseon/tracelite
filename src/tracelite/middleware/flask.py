@@ -1,10 +1,13 @@
-from werkzeug.wrappers import Request as WerkzeugRequest
-from tracelite.core.models import RequestLog
-from tracelite.core.filters import should_exclude, mask_sensitive
-from tracelite.core.config import TraceliteConfig
 import time
 from datetime import datetime
-from typing import Callable, Any, Optional
+from typing import Any, Callable, Optional
+
+from werkzeug.wrappers import Request as WerkzeugRequest
+
+from tracelite.core.config import TraceliteConfig
+from tracelite.core.filters import mask_sensitive, should_exclude
+from tracelite.core.models import RequestLog
+
 
 class TraceliteMiddleware:
     def __init__(self, app: Callable, storage: Any, config: TraceliteConfig) -> None:
@@ -38,7 +41,9 @@ class TraceliteMiddleware:
         if should_exclude(req.path, self.config.exclude_paths):
             return self.app(environ, start_response)
 
-        def custom_start_response(status: str, headers: list, exc_info: Optional[Any] = None) -> Callable:
+        def custom_start_response(
+            status: str, headers: list, exc_info: Optional[Any] = None
+        ) -> Callable:
             """
             Custom start_response to capture response metadata and log the request.
 
@@ -60,7 +65,9 @@ class TraceliteMiddleware:
                 status_code=response_status,
                 client_ip=req.remote_addr,
                 user_agent=req.headers.get("User-Agent"),
-                request_headers=mask_sensitive(dict(req.headers), self.config.mask_keys),
+                request_headers=mask_sensitive(
+                    dict(req.headers), self.config.mask_keys
+                ),
                 request_body=req.get_data(as_text=True),
                 response_headers=dict(headers),
                 response_body=None,  # capturing response body is omitted due to complexity

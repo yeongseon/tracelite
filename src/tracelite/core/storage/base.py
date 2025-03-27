@@ -1,6 +1,8 @@
 # base.py
 from abc import ABC, abstractmethod
+
 from tracelite.core.models import RequestLog
+
 
 class ILoggerStorage(ABC):
     @abstractmethod

@@ -1,8 +1,10 @@
 import pytest
 from flask import Flask, jsonify
-from tracelite.middleware.flask import TraceliteMiddleware
-from tracelite.core.storage.sqlite import SQLiteStorage
+
 from tracelite.core.config import load_config
+from tracelite.core.storage.sqlite import SQLiteStorage
+from tracelite.middleware.flask import TraceliteMiddleware
+
 
 @pytest.fixture
 def app():
@@ -18,9 +20,11 @@ def app():
     app.tracelite_storage = storage  # expose for test
     return app
 
+
 @pytest.fixture
 def client(app):
     return app.test_client()
+
 
 def test_flask_middleware_logs_request(client):
     response = client.get("/ping")
@@ -31,7 +35,6 @@ def test_flask_middleware_logs_request(client):
     log = logs[0]
 
     assert isinstance(log[1], str)
-    assert log[2] == "GET"           # method
-    assert log[3] == "/ping"        # path
-    assert log[4] == 200             # status_code
-
+    assert log[2] == "GET"  # method
+    assert log[3] == "/ping"  # path
+    assert log[4] == 200  # status_code

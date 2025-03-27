@@ -1,13 +1,16 @@
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
-import tomli
 import os
+from typing import Any, Dict, List, Optional
+
+import tomli
+from pydantic import BaseModel
+
 
 class TraceliteConfig(BaseModel):
     enabled: bool = True
     db_path: str = "tracelite.db"
     exclude_paths: List[str] = ["/static", "/favicon.ico"]
     mask_keys: List[str] = ["password", "token"]
+
 
 def load_config(app_config: Optional[Dict[str, Any]] = None) -> TraceliteConfig:
     config = TraceliteConfig()
@@ -18,7 +21,9 @@ def load_config(app_config: Optional[Dict[str, Any]] = None) -> TraceliteConfig:
             if "storage" in data:
                 config.db_path = data["storage"].get("path", config.db_path)
             if "filter" in data:
-                config.exclude_paths = data["filter"].get("exclude_paths", config.exclude_paths)
+                config.exclude_paths = data["filter"].get(
+                    "exclude_paths", config.exclude_paths
+                )
                 config.mask_keys = data["filter"].get("mask_keys", config.mask_keys)
             if "tracelite" in data:
                 config.enabled = data["tracelite"].get("enabled", config.enabled)

@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, Optional
 
+
 @dataclass
 class RequestLog:
     timestamp: datetime

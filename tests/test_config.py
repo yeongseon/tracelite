@@ -1,9 +1,11 @@
 import os
 import shutil
 import tempfile
-import tomli_w
+
 import pytest
-from tracelite.core.config import load_config, TraceliteConfig
+import tomli_w
+
+from tracelite.core.config import TraceliteConfig, load_config
 
 
 def test_default_config():

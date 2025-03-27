@@ -5,8 +5,8 @@ from django.http import JsonResponse
 from django.test import Client
 from django.urls import path
 
-from tracelite.core.storage.sqlite import SQLiteStorage
 from tracelite.core.config import load_config
+from tracelite.core.storage.sqlite import SQLiteStorage
 
 # --- Configure minimal Django test environment ---
 settings.configure(
@@ -20,19 +20,23 @@ settings.configure(
 )
 django.setup()
 
+
 # --- Define a simple view for testing ---
 def ping(request):
     return JsonResponse({"message": "pong"})
+
 
 # --- Define URL patterns ---
 urlpatterns = [
     path("ping/", ping),
 ]
 
+
 # --- Create pytest client fixture ---
 @pytest.fixture
 def client() -> Client:
     return Client()
+
 
 # --- Create config and storage fixture for Tracelite ---
 @pytest.fixture
@@ -42,6 +46,7 @@ def config_and_storage():
     settings.TRACELITE_CONFIG = config
     settings.TRACELITE_STORAGE = storage
     return config, storage
+
 
 # --- Main test: ensure Tracelite logs request correctly ---
 def test_django_middleware_logs_request(client, config_and_storage):
@@ -54,6 +59,6 @@ def test_django_middleware_logs_request(client, config_and_storage):
     log = logs[0]
 
     assert isinstance(log[1], str)
-    assert log[2] == "GET"        # method
-    assert log[3] == "/ping/"     # path
-    assert log[4] == 200          # status code
+    assert log[2] == "GET"  # method
+    assert log[3] == "/ping/"  # path
+    assert log[4] == 200  # status code

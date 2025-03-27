@@ -1,9 +1,11 @@
-from tracelite.core.filters import should_exclude, mask_sensitive
+from tracelite.core.filters import mask_sensitive, should_exclude
+
 
 def test_should_exclude():
     assert should_exclude("/static/img.png", ["/static"])
     assert should_exclude("/favicon.ico", ["/static", "/favicon.ico"])
     assert not should_exclude("/api/data", ["/static"])
+
 
 def test_mask_sensitive():
     data = {"token": "abc123", "user": "admin", "Password": "secret"}

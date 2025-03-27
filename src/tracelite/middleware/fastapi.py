@@ -1,14 +1,19 @@
+import time
+from datetime import datetime
+from typing import Any, Awaitable, Callable
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
+
+from tracelite.core.filters import mask_sensitive, should_exclude
 from tracelite.core.models import RequestLog
-from tracelite.core.filters import should_exclude, mask_sensitive
-from datetime import datetime
-import time
-from typing import Callable, Awaitable, Any
+
 
 class TraceliteMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: Callable[..., Any], storage: object, config: object) -> None:
+    def __init__(
+        self, app: Callable[..., Any], storage: object, config: object
+    ) -> None:
         """
         Initialize the middleware with app, storage, and config.
 
@@ -21,7 +26,9 @@ class TraceliteMiddleware(BaseHTTPMiddleware):
         self.storage = storage
         self.config = config
 
-    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         """
         Process each incoming request and log it based on config settings.
 
@@ -53,7 +60,9 @@ class TraceliteMiddleware(BaseHTTPMiddleware):
             status_code=response.status_code,
             client_ip=request.client.host if request.client else "",
             user_agent=request.headers.get("user-agent", ""),
-            request_headers=mask_sensitive(dict(request.headers), self.config.mask_keys),
+            request_headers=mask_sensitive(
+                dict(request.headers), self.config.mask_keys
+            ),
             request_body=request_body.decode("utf-8", errors="ignore"),
             response_headers=dict(response.headers),
             response_body=None,  # Streaming response body capture is non-trivial

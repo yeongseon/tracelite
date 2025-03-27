@@ -1,6 +1,7 @@
-from tracelite.core.storage.sqlite import SQLiteStorage
-from tracelite.core.models import RequestLog
 from datetime import datetime
+
+from tracelite.core.models import RequestLog
+from tracelite.core.storage.sqlite import SQLiteStorage
 
 
 def test_store_and_fetch():
@@ -17,5 +18,5 @@ def test_store_and_fetch():
     db.store(log)
     result = db.fetch_recent()
     assert len(result) == 1
-    assert result[0][3] == "/test"       # path
-    assert result[0][4] == 200           # status_code
+    assert result[0][3] == "/test"  # path
+    assert result[0][4] == 200  # status_code
