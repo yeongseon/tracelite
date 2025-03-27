@@ -1,4 +1,3 @@
-# README.md
 # Tracelite
 
 **Lightweight request & response tracing for your Flask, Django, or FastAPI dev server**
@@ -10,11 +9,6 @@ Tracelite logs incoming HTTP requests and outgoing responses in a structured for
 - ⚙️ Configurable masking and path exclusion (via `tracelite.toml`)
 - 📦 SQLite-based local storage
 - 📊 Pretty CLI output using `rich`
-
-## Installation
-```bash
-poetry install --with dev --extras "fastapi flask django"
-```
 
 ## Usage
 ### CLI
@@ -63,6 +57,27 @@ path = "tracelite.db"
 [filter]
 exclude_paths = ["/static", "/favicon.ico"]
 mask_keys = ["password", "token"]
+```
+
+## Development Setup
+
+```bash
+# Install Poetry if not installed
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Clone the repository
+git clone https://github.com/yeongseon/tracelite.git
+cd tracelite
+
+# Set Python version (e.g. 3.9)
+poetry env use python3.9
+
+# Install dependencies with all extras
+touch pyproject.toml  # trigger poetry env rebuild if needed
+poetry install --with dev
+
+# Activate virtual environment
+source $(poetry env info --path)/bin/activate
 ```
 
 ## Testing
