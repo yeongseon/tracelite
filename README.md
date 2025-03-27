@@ -1,5 +1,8 @@
 # Tracelite
 
+[![PyPI version](https://img.shields.io/pypi/v/tracelite)](https://pypi.org/project/tracelite/)
+[![Test](https://github.com/yeongseon/tracelite/actions/workflows/test.yml/badge.svg)](https://github.com/yeongseon/tracelite/actions/workflows/test.yml)
+
 **Lightweight request & response tracing for your Flask, Django, or FastAPI dev server**
 
 Tracelite logs incoming HTTP requests and outgoing responses in a structured format. It's ideal for local development and debugging.
@@ -43,6 +46,24 @@ config = load_config()
 storage = SQLiteStorage(db_path=config.db_path)
 
 app.add_middleware(TraceliteMiddleware, storage=storage, config=config)
+```
+
+### Django Integration
+
+In your Django `settings.py`, add:
+
+```python
+# settings.py
+from tracelite.core.config import load_config
+from tracelite.core.storage.sqlite import SQLiteStorage
+
+TRACELITE_CONFIG = load_config()
+TRACELITE_STORAGE = SQLiteStorage(db_path=TRACELITE_CONFIG.db_path)
+
+MIDDLEWARE = [
+    # ... other middleware ...
+    "tracelite.middleware.django.TraceliteMiddleware",
+]
 ```
 
 ## Configuration (tracelite.toml)
