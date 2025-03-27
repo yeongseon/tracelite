@@ -1,57 +1,59 @@
-"""
-Tracelite middleware for Django applications.
-Logs HTTP requests and responses during local development.
-"""
-
-from django.utils.deprecation import MiddlewareMixin
+import django
+import pytest
 from django.conf import settings
-from tracelite.core.models import RequestLog
-from tracelite.core.filters import should_exclude, mask_sensitive
-from datetime import datetime
-import time
-from typing import Any
+from django.http import JsonResponse
+from django.test import Client
+from django.urls import path
 
-class TraceliteMiddleware(MiddlewareMixin):
-    def __init__(self, get_response: Any = None, storage: Any = None, config: Any = None) -> None:
-        """
-        Initialize Django middleware.
+from tracelite.core.storage.sqlite import SQLiteStorage
+from tracelite.core.config import load_config
 
-        If `storage` and `config` are not passed directly, it will try to get them from Django settings.
+# --- Configure minimal Django test environment ---
+settings.configure(
+    DEBUG=True,
+    ROOT_URLCONF=__name__,
+    SECRET_KEY="test",
+    ALLOWED_HOSTS=["*"],
+    MIDDLEWARE=[
+        "tracelite.middleware.django.TraceliteMiddleware",
+    ],
+)
+django.setup()
 
-        Args:
-            get_response: Django's view handler.
-            storage: Optional. An object with a `.store()` method.
-            config: Optional. Tracelite config with enabled flag, filters, etc.
-        """
-        self.get_response = get_response
-        self.storage = storage or getattr(settings, "TRACELITE_STORAGE", None)
-        self.config = config or getattr(settings, "TRACELITE_CONFIG", None)
+# --- Define a simple view for testing ---
+def ping(request):
+    return JsonResponse({"message": "pong"})
 
-    def __call__(self, request):
-        if not self.config or not self.config.enabled:
-            return self.get_response(request)
+# --- Define URL patterns ---
+urlpatterns = [
+    path("ping/", ping),
+]
 
-        if should_exclude(request.path, self.config.exclude_paths):
-            return self.get_response(request)
+# --- Create pytest client fixture ---
+@pytest.fixture
+def client() -> Client:
+    return Client()
 
-        start_time = time.time()
-        request_body = request.body
-        response = self.get_response(request)
-        duration = (time.time() - start_time) * 1000
+# --- Create config and storage fixture for Tracelite ---
+@pytest.fixture
+def config_and_storage():
+    config = load_config()
+    storage = SQLiteStorage(":memory:")
+    settings.TRACELITE_CONFIG = config
+    settings.TRACELITE_STORAGE = storage
+    return config, storage
 
-        log = RequestLog(
-            timestamp=datetime.utcnow(),
-            method=request.method,
-            path=request.path,
-            status_code=response.status_code,
-            client_ip=request.META.get("REMOTE_ADDR", ""),
-            user_agent=request.META.get("HTTP_USER_AGENT", ""),
-            request_headers=mask_sensitive(dict(request.headers), self.config.mask_keys),
-            request_body=request_body.decode("utf-8", errors="ignore"),
-            response_headers=dict(response.items()),
-            response_body=None,
-            duration_ms=duration,
-        )
+# --- Main test: ensure Tracelite logs request correctly ---
+def test_django_middleware_logs_request(client, config_and_storage):
+    config, storage = config_and_storage
+    response = client.get("/ping/")
+    assert response.status_code == 200
 
-        self.storage.store(log)
-        return response
+    logs = storage.fetch_recent()
+    assert len(logs) == 1
+    log = logs[0]
+
+    assert isinstance(log[1], str)
+    assert log[2] == "GET"        # method
+    assert log[3] == "/ping/"     # path
+    assert log[4] == 200          # status code

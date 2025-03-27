@@ -4,6 +4,7 @@ Logs HTTP requests and responses during local development.
 """
 
 from django.utils.deprecation import MiddlewareMixin
+from django.conf import settings
 from tracelite.core.models import RequestLog
 from tracelite.core.filters import should_exclude, mask_sensitive
 from datetime import datetime
@@ -15,14 +16,16 @@ class TraceliteMiddleware(MiddlewareMixin):
         """
         Initialize Django middleware.
 
+        If `storage` and `config` are not passed directly, it will try to get them from Django settings.
+
         Args:
             get_response: Django's view handler.
-            storage: An object with a `.store()` method.
-            config: Tracelite config with enabled flag, filters, etc.
+            storage: Optional. An object with a `.store()` method.
+            config: Optional. Tracelite config with enabled flag, filters, etc.
         """
         self.get_response = get_response
-        self.storage = storage
-        self.config = config
+        self.storage = storage or getattr(settings, "TRACELITE_STORAGE", None)
+        self.config = config or getattr(settings, "TRACELITE_CONFIG", None)
 
     def __call__(self, request):
         if not self.config or not self.config.enabled:
