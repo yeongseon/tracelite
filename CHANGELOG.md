@@ -7,10 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.4] - 2025-03-29
+
+### ✨ Added
+- FastAPI demo app in `examples/fastapi_demo`
+- Django demo app in `examples/django_demo`
+
+
+---
+
 ## [0.2.3] - 2025-03-28
 
 ### ✨ Added
-- Flask demo app in `examples/`
+- Flask demo app in `examples/flask_demo`
 - Streamlit log viewer CLI command (`tracelite view-ui`)
 
 ### 🐞 Fixed
