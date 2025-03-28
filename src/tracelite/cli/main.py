@@ -46,6 +46,14 @@ def view(since: int = 3600):
 
 
 @app.command()
+def view_ui() -> None:
+    """Launch Streamlit UI for viewing logs."""
+    import subprocess
+
+    subprocess.run(["streamlit", "run", "src/tracelite/ui/viewer.py"])
+
+
+@app.command()
 def export(format: str = "json"):
     """Export logs to given format."""
     try:

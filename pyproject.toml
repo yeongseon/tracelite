@@ -10,7 +10,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.9,<3.9.7 || >3.9.7,<4.0"
 pydantic = "^2.6"
 typer = "^0.15"
 rich = "^13.7"
@@ -29,6 +29,7 @@ tomli-w = "^1.2.0"
 black = "^25.1.0"
 isort = "^6.0.1"
 pre-commit = "^4.2.0"
+streamlit = "^1.44.0"
 
 [tool.poetry.extras]
 flask = ["flask"]
