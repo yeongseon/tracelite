@@ -38,7 +38,7 @@ def view(since: int = 3600):
     table.add_column("Duration (ms)", justify="right")
 
     for row in logs:
-        timestamp, method, path, status_code, *_, duration_ms = row
+        _, timestamp, method, path, status_code, *_, duration_ms = row
         table.add_row(timestamp, method, path, str(status_code), f"{duration_ms:.2f}")
 
     console = Console()
