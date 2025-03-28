@@ -1,10 +1,12 @@
-from subprocess import Popen, PIPE
-import time
 import tempfile
-import pytest
+import time
 from datetime import datetime
-from tracelite.core.storage.sqlite import SQLiteStorage
+from subprocess import PIPE, Popen
+
+import pytest
+
 from tracelite.core.models import RequestLog
+from tracelite.core.storage.sqlite import SQLiteStorage
 from tracelite.ui.viewer import load_logs
 
 
@@ -52,6 +54,6 @@ def test_load_logs(sample_db_path: str) -> None:
     logs = load_logs(sample_db_path)
     assert len(logs) == 1
     log = logs[0]
-    assert log[2] == "GET"           # method
-    assert log[3] == "/ping"         # path
-    assert log[4] == 200             # status_code
+    assert log[2] == "GET"  # method
+    assert log[3] == "/ping"  # path
+    assert log[4] == 200  # status_code

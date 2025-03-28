@@ -1,9 +1,10 @@
-import streamlit as st
-import pandas as pd
-from typing import List, Tuple, Any
+from typing import Any, List, Tuple
 
-from tracelite.core.storage.sqlite import SQLiteStorage
+import pandas as pd
+import streamlit as st
+
 from tracelite.core.config import TraceliteConfig, load_config
+from tracelite.core.storage.sqlite import SQLiteStorage
 
 
 def load_logs(db_path: str) -> List[Tuple[Any, ...]]:
