@@ -1,0 +1,28 @@
+[build-system]
+requires = [ "hatchling",]
+build-backend = "hatchling.build"
+
+[project]
+name = "tracelite"
+version = "0.3.2"
+description = "Lightweight request & response tracing for your Flask, Django, or FastAPI dev server"
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
+dependencies = [ "pydantic>=2.6", "typer>=0.15", "rich>=13.7", "sqlalchemy>=2.0", "tomli>=2.0", "flask>=3.0", "fastapi>=0.115.12", "starlette>=0.46.1", "httpx>=0.28.1", "django>=4.2",]
+[[project.authors]]
+name = "Yeongseon Choe"
+email = "yeongseon.choe@gmail.com"
+
+[project.optional-dependencies]
+dev = [ "pytest>=8.3.5", "pytest-cov>=5.0.0", "tomli-w>=1.2.0", "black>=25.1.0", "isort>=6.0.1", "pre-commit>=4.2.0", "streamlit>=1.44.0",]
+
+[project.scripts]
+tracelite = "tracelite.cli.main:cli"
+
+[tool.black]
+line-length = 88
+target-version = [ "py39",]
+
+[tool.isort]
+profile = "black"

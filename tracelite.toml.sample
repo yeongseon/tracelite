@@ -1,0 +1,17 @@
+# tracelite.toml.sample
+
+[tracelite]
+enabled = true
+
+[storage]
+type = "sqlite"
+path = "tracelite.db"
+
+[filter]
+exclude_paths = ["/static", "/favicon.ico"]
+mask_keys = ["password", "token"]
+
+[view]
+# Columns to display in 'tracelite view' output
+columns = ["timestamp", "client_ip", "method", "path", "status", "duration"]
+
