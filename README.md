@@ -1,6 +1,6 @@
 # Tracelite
 
-[![CI](https://github.com/yeongseon/tracelite/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/yeongseon/tracelite/actions/workflows/tests.yml)
+[![CI](https://github.com/yeongseon/tracelite/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yeongseon/tracelite/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/tracelite.svg)](https://pypi.org/project/tracelite/)
 [![Coverage Status](https://coveralls.io/repos/github/yeongseon/tracelite/badge.svg?branch=main)](https://coveralls.io/github/yeongseon/tracelite?branch=main)
 
