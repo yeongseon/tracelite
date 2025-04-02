@@ -1,7 +1,10 @@
 # Tracelite
 
-[![PyPI version](https://img.shields.io/pypi/v/tracelite)](https://pypi.org/project/tracelite/)
-[![Test](https://github.com/yeongseon/tracelite/actions/workflows/test.yml/badge.svg)](https://github.com/yeongseon/tracelite/actions/workflows/test.yml)
+[![CI](https://github.com/yeongseon/tracelite/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/yeongseon/tracelite/actions/workflows/tests.yml)
+[![PyPI version](https://img.shields.io/pypi/v/tracelite.svg)](https://pypi.org/project/tracelite/)
+[![Coverage Status](https://coveralls.io/repos/github/yeongseon/tracelite/badge.svg?branch=main)](https://coveralls.io/github/yeongseon/tracelite?branch=main)
+
+---
 
 **Lightweight HTTP request & response tracing for Flask, Django, and FastAPI.**  
 Tracelite logs incoming HTTP requests and outgoing responses in a structured format.  
