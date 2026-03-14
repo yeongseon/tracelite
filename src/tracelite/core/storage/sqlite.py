@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from tracelite.core.models import RequestLog
@@ -21,6 +21,7 @@ class SQLiteStorage(ILoggerStorage):
                 timestamp TEXT,
                 method TEXT,
                 path TEXT,
+                query TEXT,
                 status_code INTEGER,
                 client_ip TEXT,
                 user_agent TEXT,
@@ -28,7 +29,8 @@ class SQLiteStorage(ILoggerStorage):
                 request_body TEXT,
                 response_headers TEXT,
                 response_body TEXT,
-                duration_ms REAL
+                duration_ms REAL,
+                sql_queries TEXT
             )
             """
             )
@@ -38,14 +40,16 @@ class SQLiteStorage(ILoggerStorage):
             self.conn.execute(
                 """
             INSERT INTO request_logs (
-                timestamp, method, path, status_code, client_ip, user_agent,
-                request_headers, request_body, response_headers, response_body, duration_ms
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                timestamp, method, path, query, status_code, client_ip, user_agent,
+                request_headers, request_body, response_headers, response_body, duration_ms,
+                sql_queries
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 (
-                    log.timestamp.isoformat(),
+                    (log.timestamp or datetime.now(timezone.utc)).isoformat(),
                     log.method,
                     log.path,
+                    log.query,
                     log.status_code,
                     log.client_ip,
                     log.user_agent,
@@ -54,22 +58,34 @@ class SQLiteStorage(ILoggerStorage):
                     json.dumps(log.response_headers),
                     log.response_body,
                     log.duration_ms,
+                    json.dumps(log.sql_queries) if log.sql_queries else None,
                 ),
             )
 
-    def fetch_recent(self, since_seconds: int = 3600, filters: Optional[dict] = None):
+    def fetch_recent(
+        self,
+        since_seconds: int = 3600,
+        filters: Optional[dict[str, str | int]] = None,
+    ):
         query = "SELECT * FROM request_logs WHERE timestamp >= datetime('now', ?)"
-        params = [f"-{since_seconds} seconds"]
+        params: list[object] = [f"-{since_seconds} seconds"]
 
         if filters:
             for key, value in filters.items():
                 if key not in ["method", "status_code", "path", "client_ip"]:
                     continue  # 안전하게 허용된 필드만
                 query += f" AND {key} = ?"
-                params.append(value)
+                params.append(str(value))
 
         query += " ORDER BY timestamp DESC"
         cursor = self.conn.execute(query, params)
+        return cursor.fetchall()
+
+    def fetch_by_path(self, path: str, limit: int = 10):
+        cursor = self.conn.execute(
+            "SELECT * FROM request_logs WHERE path = ? ORDER BY timestamp DESC LIMIT ?",
+            (path, limit),
+        )
         return cursor.fetchall()
 
     def export(self, format: str = "json") -> str:

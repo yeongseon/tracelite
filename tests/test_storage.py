@@ -19,7 +19,8 @@ def test_store_and_fetch():
     result = db.fetch_recent()
     assert len(result) == 1
     assert result[0][3] == "/test"  # path
-    assert result[0][4] == 200  # status_code
+    assert result[0][4] is None  # query (new column)
+    assert result[0][5] == 200  # status_code
 
 
 def test_fetch_recent_with_filters(tmp_path):
@@ -70,4 +71,4 @@ def test_fetch_recent_with_filters(tmp_path):
     # Filter by status
     logs = storage.fetch_recent(filters={"status_code": 200})
     assert len(logs) == 1
-    assert logs[0][4] == 200
+    assert logs[0][5] == 200  # status_code (shifted by query column)

@@ -11,8 +11,13 @@ class ILoggerStorage(ABC):
         pass
 
     @abstractmethod
-    def fetch_recent(self, since_seconds: int = 3600) -> list:
+    def fetch_recent(self, since_seconds: int = 3600) -> list[tuple[object, ...]]:
         """Fetch logs from the last N seconds."""
+        pass
+
+    @abstractmethod
+    def fetch_by_path(self, path: str, limit: int = 10) -> list[tuple[object, ...]]:
+        """Fetch recent logs for a specific endpoint path."""
         pass
 
     @abstractmethod
