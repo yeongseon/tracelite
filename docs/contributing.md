@@ -1,6 +1,6 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to Tracelite!
+Thank you for your interest in contributing to TraceLite!
 
 ## How to Contribute
 

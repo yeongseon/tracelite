@@ -1,6 +1,6 @@
-# Django Demo for Tracelite
+# Django Demo for TraceLite
 
-This is a simple Django app demonstrating how to integrate Tracelite middleware.
+This is a simple Django app demonstrating how to integrate TraceLite middleware.
 
 ## Run
 
@@ -13,3 +13,4 @@ python examples/django_demo/manage.py migrate
 
 # Run the Django demo app
 python examples/django_demo/manage.py runserver
+```

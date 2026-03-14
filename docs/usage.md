@@ -1,10 +1,25 @@
 # Usage
 
-Tracelite can be used in multiple ways:
+TraceLite can be used in multiple ways:
 
 ---
 
-## 1. CLI Viewer
+## 1. One-Line Setup (Recommended)
+
+The easiest way to get started is with `enable_tracing()`:
+
+```python
+from tracelite import enable_tracing
+
+app = FastAPI()  # or Flask(__name__) or Django WSGI app
+enable_tracing(app)
+```
+
+Then open `http://localhost:8000/_tracelite` to see the dashboard.
+
+---
+
+## 2. CLI Viewer
 
 You can view and export logs directly from the command line.
 
@@ -16,60 +31,54 @@ tracelite view
 
 ### Export Options
 
-You can export logs to JSON, CSV, or Table formats:
+You can export logs to JSON or CSV formats:
 
 ```bash
 tracelite export --format json
 tracelite export --format csv
 ```
 
-### Filter Options
+### Column Selection
 
-You can filter logs by any field:
+You can select specific columns to display:
 
 ```bash
-tracelite view --filter "status=500"
-tracelite view --filter "method=POST" --filter "status=200"
+tracelite view --columns method,path,status_code
 ```
-Supports exact match only.
 
-## 2. Middleware Integration
+---
 
-### Flask Example
-
-```python
-from flask import Flask
-from tracelite.middleware.flask import TraceliteMiddleware
-
-app = Flask()
-app.wsgi_app = TraceliteMiddleware(app.wsgi_app)
-```
+## 3. Middleware Integration
 
 ### FastAPI Example
 
 ```python
 from fastapi import FastAPI
 from tracelite.middleware.fastapi import TraceliteMiddleware
+from tracelite.core.storage.sqlite import SQLiteStorage
+from tracelite.core.config import load_config
 
 app = FastAPI()
-app.add_middleware(TraceliteMiddleware)
+app.add_middleware(TraceliteMiddleware, storage=SQLiteStorage(), config=load_config())
+```
+
+### Flask Example
+
+```python
+from flask import Flask
+from tracelite.middleware.flask import TraceliteMiddleware
+from tracelite.core.storage.sqlite import SQLiteStorage
+from tracelite.core.config import load_config
+
+app = Flask(__name__)
+app.wsgi_app = TraceliteMiddleware(app.wsgi_app, SQLiteStorage(), load_config())
 ```
 
 ### Django Example
 
 ```python
-MIDDLEWARE = [
-    # ... other middleware ...
-    "tracelite.middleware.django.TraceliteMiddleware",
-]
+from tracelite import enable_tracing
+
+# In your Django WSGI application
+enable_tracing(application)
 ```
-
-## 3. Streamlit Viewer
-
-If Streamlit is installed:
-
-```bash
-tracelite view --ui
-```
-
-**Note:** Streamlit viewer is optional.

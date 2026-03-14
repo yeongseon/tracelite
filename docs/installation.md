@@ -1,17 +1,19 @@
 # Installation
 
-You can install Tracelite using `pip`:
+You can install TraceLite using `pip`:
 
 ```bash
 pip install tracelite
 ```
 
-## Optional Dependencies
+## Framework Extras
 
-If you want to use the Streamlit UI viewer:
+Install with framework-specific dependencies:
 
 ```bash
-pip install streamlit
+pip install tracelite[fastapi]     # FastAPI / Starlette support
+pip install tracelite[flask]       # Flask support
+pip install tracelite[django]      # Django support
 ```
 
 ---

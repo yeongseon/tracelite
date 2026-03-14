@@ -1,6 +1,6 @@
-# FastAPI Demo for Tracelite
+# FastAPI Demo for TraceLite
 
-This is a simple FastAPI app demonstrating how to integrate Tracelite middleware.
+This is a simple FastAPI app demonstrating how to integrate TraceLite middleware.
 
 ## Run
 
@@ -10,3 +10,4 @@ source .venv/bin/activate
 
 # Run the FastAPI demo app
 uvicorn examples/fastapi_demo.main:app --reload
+```
