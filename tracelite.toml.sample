@@ -8,10 +8,21 @@ type = "sqlite"
 path = "tracelite.db"
 
 [filter]
-exclude_paths = ["/static", "/favicon.ico"]
-mask_keys = ["password", "token"]
+exclude_paths = ["/static", "/favicon.ico", "/_tracelite"]
+mask_keys = ["password", "token", "authorization", "secret"]
+
+[capture]
+capture_body = true
+# Enable SQL query capture (requires SQLAlchemy or Django ORM hooks)
+capture_sql = false
+
+[dashboard]
+path = "/_tracelite"
+
+[slow]
+# Highlight requests slower than this threshold (in milliseconds)
+threshold_ms = 1000
 
 [view]
 # Columns to display in 'tracelite view' output
 columns = ["timestamp", "client_ip", "method", "path", "status", "duration"]
-

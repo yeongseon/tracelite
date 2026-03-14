@@ -8,8 +8,12 @@ from pydantic import BaseModel
 class TraceliteConfig(BaseModel):
     enabled: bool = True
     db_path: str = "tracelite.db"
+    capture_body: bool = True
+    dashboard_path: str = "/_tracelite"
     exclude_paths: List[str] = ["/static", "/favicon.ico"]
-    mask_keys: List[str] = ["password", "token"]
+    mask_keys: List[str] = ["password", "token", "authorization", "secret"]
+    capture_sql: bool = False
+    slow_threshold_ms: int = 1000
     view_columns: List[str] = [
         "timestamp",
         "client_ip",
@@ -33,6 +37,21 @@ def load_config(app_config: Optional[Dict[str, Any]] = None) -> TraceliteConfig:
                     "exclude_paths", config.exclude_paths
                 )
                 config.mask_keys = data["filter"].get("mask_keys", config.mask_keys)
+            if "capture" in data:
+                config.capture_body = data["capture"].get(
+                    "capture_body", config.capture_body
+                )
+                config.capture_sql = data["capture"].get(
+                    "capture_sql", config.capture_sql
+                )
+            if "dashboard" in data:
+                config.dashboard_path = data["dashboard"].get(
+                    "path", config.dashboard_path
+                )
+            if "slow" in data:
+                config.slow_threshold_ms = data["slow"].get(
+                    "threshold_ms", config.slow_threshold_ms
+                )
             if "tracelite" in data:
                 config.enabled = data["tracelite"].get("enabled", config.enabled)
             if "view" in data:
