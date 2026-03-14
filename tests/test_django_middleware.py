@@ -61,4 +61,5 @@ def test_django_middleware_logs_request(client, config_and_storage):
     assert isinstance(log[1], str)
     assert log[2] == "GET"  # method
     assert log[3] == "/ping/"  # path
-    assert log[4] == 200  # status code
+    assert log[4] is None or isinstance(log[4], str)  # query
+    assert log[5] == 200  # status code

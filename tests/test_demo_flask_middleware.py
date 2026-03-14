@@ -37,4 +37,5 @@ def test_flask_middleware_logs_request(client):
     assert isinstance(log[1], str)
     assert log[2] == "GET"  # method
     assert log[3] == "/ping"  # path
-    assert log[4] == 200  # status_code
+    assert log[4] is None  # query
+    assert log[5] == 200  # status_code
